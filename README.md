@@ -1,0 +1,1 @@
+## Za pokretanje aplikacije potrebno je u terminalu, iz korijenskog direktorija projekta, izvršiti naredbu bash run.sh. Skripta će automatski pokrenuti bazu podataka i aplikaciju.
