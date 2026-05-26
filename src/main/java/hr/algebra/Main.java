@@ -1,3 +1,5 @@
+package hr.algebra;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
@@ -47,7 +49,7 @@ public class Main {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Greška: " + e.getMessage());
+            System.err.println("Greska: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -57,36 +59,34 @@ public class Main {
         System.out.println("1. Unesi novog polaznika");
         System.out.println("2. Unesi novi program obrazovanja");
         System.out.println("3. Upisi polaznika na program obrazovanja");
-        System.out.println("4. Prikaži sve polaznika");
-        System.out.println("5. Prikaži sve programe obrazovanja");
-        System.out.println("6. Prikaži sve upise");
+        System.out.println("4. Prikazi sve polaznika");
+        System.out.println("5. Prikazi sve programe obrazovanja");
+        System.out.println("6. Prikazi sve upise");
         System.out.println("7. Prebaci polaznika iz jednog u drugi program");
-        System.out.println("8. Prikaži polaznika i njegove programe");
+        System.out.println("8. Prikazi polaznika i njegove programe");
         System.out.println("9. Izlaz");
         System.out.print("Odaberi opciju: ");
     }
 
-    // 1. Unesi novog polaznika
+    
     private static void unesiNovogPolaznika() throws SQLException {
         System.out.println("\n=== UNOS NOVOG POLAZNIKA ===");
         System.out.print("Unesi ime: ");
         String ime = scanner.nextLine();
         System.out.print("Unesi prezime: ");
         String prezime = scanner.nextLine();
-        System.out.print("Unesi naziv: ");
-        String naziv = scanner.nextLine();
         
-        Polaznik polaznik = new Polaznik(ime, prezime, naziv);
+        Polaznik polaznik = new Polaznik(ime, prezime);
         int noviID = PolaznikDAO.insertPolaznik(polaznik);
         
         if (noviID > 0) {
-            System.out.println("✓ Polaznik uspješno unesen! ID: " + noviID);
+            System.out.println("Polaznik uspjesno unesen! ID: " + noviID);
         } else {
-            System.out.println("✗ Greška pri unosu polaznika!");
+            System.out.println("Greska pri unosu polaznika!");
         }
     }
 
-    // 2. Unesi novi program obrazovanja
+    
     private static void unesiNoviProgramObrazovanja() throws SQLException {
         System.out.println("\n=== UNOS NOVOG PROGRAMA OBRAZOVANJA ===");
         System.out.print("Unesi naziv programa: ");
@@ -98,13 +98,13 @@ public class Main {
         int noviID = ProgramObrazovanjaDAO.insertProgramObrazovanja(program);
         
         if (noviID > 0) {
-            System.out.println("✓ Program obrazovanja uspješno unesen! ID: " + noviID);
+            System.out.println("✓ Program obrazovanja uspjesno unesen! ID: " + noviID);
         } else {
-            System.out.println("✗ Greška pri unosu programa!");
+            System.out.println("✗ Greska pri unosu programa!");
         }
     }
 
-    // 3. Upisi polaznika na program
+    
     private static void unesiNoviUpis() throws SQLException {
         System.out.println("\n=== UPIS POLAZNIKA NA PROGRAM ===");
         System.out.print("Unesi ID polaznika: ");
@@ -129,13 +129,13 @@ public class Main {
         
         if (noviID > 0) {
             System.out.println("✓ Polaznik " + polaznik.getIme() + " " + polaznik.getPrezime() + 
-                             " uspješno upisan na program: " + program.getNaziv());
+                             " uspjesno upisan na program: " + program.getNaziv());
         } else {
-            System.out.println("✗ Greška pri upisu!");
+            System.out.println("✗ Greska pri upisu!");
         }
     }
 
-    // 4. Prikaži sve polaznika
+    
     private static void prikaziSvePolaznika() throws SQLException {
         System.out.println("\n=== SVI POLAZNICI ===");
         List<Polaznik> polaznici = PolaznikDAO.getAllPolaznici();
@@ -150,7 +150,7 @@ public class Main {
         }
     }
 
-    // 5. Prikaži sve programe
+    
     private static void prikaziSveProgrameObrazovanja() throws SQLException {
         System.out.println("\n=== SVI PROGRAMI OBRAZOVANJA ===");
         List<ProgramObrazovanja> programi = ProgramObrazovanjaDAO.getAllProgrami();
@@ -165,7 +165,7 @@ public class Main {
         }
     }
 
-    // 6. Prikaži sve upise
+    
     private static void prikaziSveUpise() throws SQLException {
         System.out.println("\n=== SVI UPISI ===");
         List<Upis> upisi = UpisDAO.getAllUpisi();
@@ -180,36 +180,19 @@ public class Main {
         }
     }
 
-    // 7. Prebaci polaznika iz jednog u drugi program
     private static void prebaciPolaznikaIzJednoguUDrugiProgram() throws SQLException {
-        System.out.println("\n=== PREBACIVANJE POLAZNIKA NA DRUGI PROGRAM ===");
-        System.out.print("Unesi ID upisa koji trebaš promijeniti: ");
+        System.out.print("Unesi ID upisa: ");
         int upisID = unosBroja();
-        
-        Upis upis = UpisDAO.getUpisById(upisID);
-        if (upis == null) {
-            System.out.println("✗ Upis sa tim ID ne postoji!");
-            return;
-        }
-        
-        System.out.print("Unesi novi ID programa obrazovanja: ");
+        System.out.print("Unesi novi ID programa: ");
         int noviProgramID = unosBroja();
-        
-        ProgramObrazovanja noviProgram = ProgramObrazovanjaDAO.getProgramById(noviProgramID);
-        if (noviProgram == null) {
-            System.out.println("✗ Program sa tim ID ne postoji!");
-            return;
-        }
-        
-        upis.setIdProgramObrazovanja(noviProgramID);
-        if (UpisDAO.updateUpis(upis)) {
-            System.out.println("✓ Polaznik uspješno prebačen na program: " + noviProgram.getNaziv());
+
+        if (UpisDAO.prebaciPolaznika(upisID, noviProgramID)) {
+            System.out.println("Polaznik uspjesno prebacen!");
         } else {
-            System.out.println("✗ Greška pri prebacivanju!");
+            System.out.println("Greska pri prebacivanju!");
         }
     }
-
-    // 8. Prikaži polaznika i njegove programe
+    
     private static void prikaziPolaznikaISnjegovePrograme() throws SQLException {
         System.out.println("\n=== PREGLED POLAZNIKA I PROGRAMA ===");
         System.out.print("Unesi ID polaznika: ");

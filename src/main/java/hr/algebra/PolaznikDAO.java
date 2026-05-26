@@ -1,38 +1,27 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+package hr.algebra;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PolaznikDAO {
 
-    // Unesi novog polaznika
     public static int insertPolaznik(Polaznik polaznik) throws SQLException {
-        String sql = "INSERT INTO Polaznik (Ime, Prezime, Naziv) VALUES (?, ?, ?)";
-        
+        String sql = "{ ? = call sp_insert_polaznik(?, ?) }";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            stmt.setString(1, polaznik.getIme());
-            stmt.setString(2, polaznik.getPrezime());
-            stmt.setString(3, polaznik.getNaziv());
-            
-            int affectedRows = stmt.executeUpdate();
-            
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        return generatedKeys.getInt(1);
-                    }
-                }
-            }
+             CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setString(2, polaznik.getIme());
+            stmt.setString(3, polaznik.getPrezime());
+            stmt.execute();
+
+            return stmt.getInt(1);
         }
-        return -1;
     }
 
-    // Dohvati polaznika po ID
+
     public static Polaznik getPolaznikById(int id) throws SQLException {
         String sql = "SELECT * FROM Polaznik WHERE PolaznikID = ?";
         
@@ -45,8 +34,7 @@ public class PolaznikDAO {
                     return new Polaznik(
                         rs.getInt("PolaznikID"),
                         rs.getString("Ime"),
-                        rs.getString("Prezime"),
-                        rs.getString("Naziv")
+                        rs.getString("Prezime")
                     );
                 }
             }
@@ -54,7 +42,7 @@ public class PolaznikDAO {
         return null;
     }
 
-    // Dohvati sve polaznika
+
     public static List<Polaznik> getAllPolaznici() throws SQLException {
         List<Polaznik> polaznici = new ArrayList<>();
         String sql = "SELECT * FROM Polaznik";
@@ -67,15 +55,14 @@ public class PolaznikDAO {
                 polaznici.add(new Polaznik(
                     rs.getInt("PolaznikID"),
                     rs.getString("Ime"),
-                    rs.getString("Prezime"),
-                    rs.getString("Naziv")
+                    rs.getString("Prezime")
                 ));
             }
         }
         return polaznici;
     }
 
-    // Ažuriraj polaznika
+
     public static boolean updatePolaznik(Polaznik polaznik) throws SQLException {
         String sql = "UPDATE Polaznik SET Ime = ?, Prezime = ?, Naziv = ? WHERE PolaznikID = ?";
         
@@ -84,14 +71,13 @@ public class PolaznikDAO {
             
             stmt.setString(1, polaznik.getIme());
             stmt.setString(2, polaznik.getPrezime());
-            stmt.setString(3, polaznik.getNaziv());
             stmt.setInt(4, polaznik.getPolaznikID());
             
             return stmt.executeUpdate() > 0;
         }
     }
 
-    // Obriši polaznika
+
     public static boolean deletePolaznik(int id) throws SQLException {
         String sql = "DELETE FROM Polaznik WHERE PolaznikID = ?";
         

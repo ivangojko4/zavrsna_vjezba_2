@@ -1,23 +1,22 @@
+package hr.algebra;
+
 public class Polaznik {
     private int polaznikID;
     private String ime;
     private String prezime;
-    private String naziv;
 
     public Polaznik() {
     }
 
-    public Polaznik(String ime, String prezime, String naziv) {
+    public Polaznik(String ime, String prezime) {
         this.ime = ime;
         this.prezime = prezime;
-        this.naziv = naziv;
     }
 
-    public Polaznik(int polaznikID, String ime, String prezime, String naziv) {
+    public Polaznik(int polaznikID, String ime, String prezime) {
         this.polaznikID = polaznikID;
         this.ime = ime;
         this.prezime = prezime;
-        this.naziv = naziv;
     }
 
     public int getPolaznikID() {
@@ -44,21 +43,12 @@ public class Polaznik {
         this.prezime = prezime;
     }
 
-    public String getNaziv() {
-        return naziv;
-    }
-
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
     @Override
     public String toString() {
         return "Polaznik{" +
                 "polaznikID=" + polaznikID +
                 ", ime='" + ime + '\'' +
                 ", prezime='" + prezime + '\'' +
-                ", naziv='" + naziv + '\'' +
                 '}';
     }
 }

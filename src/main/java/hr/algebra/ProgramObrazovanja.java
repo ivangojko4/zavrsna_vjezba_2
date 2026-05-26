@@ -1,3 +1,5 @@
+package hr.algebra;
+
 public class ProgramObrazovanja {
     private int programObrazovanjaID;
     private String naziv;

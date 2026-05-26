@@ -1,3 +1,5 @@
+package hr.algebra;
+
 public class Upis {
     private int upisID;
     private int idPolaznik;

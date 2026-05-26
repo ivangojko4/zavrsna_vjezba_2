@@ -1,37 +1,27 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+package hr.algebra;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProgramObrazovanjaDAO {
 
-    // Unesi novi program obrazovanja
     public static int insertProgramObrazovanja(ProgramObrazovanja program) throws SQLException {
-        String sql = "INSERT INTO ProgramObrazovanja (Naziv, CSVET) VALUES (?, ?)";
-        
+        String sql = "{ ? = call sp_insert_program(?, ?) }";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            stmt.setString(1, program.getNaziv());
-            stmt.setInt(2, program.getCsvet());
-            
-            int affectedRows = stmt.executeUpdate();
-            
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        return generatedKeys.getInt(1);
-                    }
-                }
-            }
+             CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setString(2, program.getNaziv());
+            stmt.setInt(3, program.getCsvet());
+            stmt.execute();
+
+            return stmt.getInt(1);
         }
-        return -1;
     }
 
-    // Dohvati program po ID
+
     public static ProgramObrazovanja getProgramById(int id) throws SQLException {
         String sql = "SELECT * FROM ProgramObrazovanja WHERE ProgramObrazovanjaID = ?";
         
@@ -52,7 +42,7 @@ public class ProgramObrazovanjaDAO {
         return null;
     }
 
-    // Dohvati sve programe
+
     public static List<ProgramObrazovanja> getAllProgrami() throws SQLException {
         List<ProgramObrazovanja> programi = new ArrayList<>();
         String sql = "SELECT * FROM ProgramObrazovanja";
@@ -72,7 +62,7 @@ public class ProgramObrazovanjaDAO {
         return programi;
     }
 
-    // Ažuriraj program
+
     public static boolean updateProgram(ProgramObrazovanja program) throws SQLException {
         String sql = "UPDATE ProgramObrazovanja SET Naziv = ?, CSVET = ? WHERE ProgramObrazovanjaID = ?";
         
@@ -87,7 +77,7 @@ public class ProgramObrazovanjaDAO {
         }
     }
 
-    // Obriši program
+
     public static boolean deleteProgram(int id) throws SQLException {
         String sql = "DELETE FROM ProgramObrazovanja WHERE ProgramObrazovanjaID = ?";
         
